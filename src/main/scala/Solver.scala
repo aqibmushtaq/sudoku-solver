@@ -14,9 +14,14 @@ object Solver {
   }
 
   def readFile(filename: String): Try[List[List [String]]] = {
-    val lines = Source.fromFile(filename).getLines
+    val lines = Source.fromURL(getClass().getResource(filename)).getLines
     val res = lines.map(_.split("").drop(1).toList)
     Try(res.toList)
+  }
+
+  def presolve(grid: List[List[String]]): List[List[String]] {
+
+    null
   }
 
   def solve(grid: List[List[String]]) = {
@@ -39,7 +44,10 @@ object Solver {
         // filter lines which are not possible from the given grid
         line.zipWithIndex.foldLeft(true){(r,c) =>
           // check every number in the possible line for matches in the grid
-          val res = for(line <- grid.patch(lineAndIndex._2, Nil, 1)) yield line(c._2) != c._1
+          val gridWithoutCurrentLine = grid.patch(lineAndIndex._2, Nil, 1);
+          val res = gridWithoutCurrentLine.map{lineFromGrid =>
+            lineFromGrid(c._2) != c._1.toString
+          }
           res.reduce(_&&_)
         }
       }
@@ -48,8 +56,8 @@ object Solver {
       newarr
     }
     grids.foreach{elem => println(elem.size)}
-    // val n = grids.foldLeft(1.toLong){(r,c) => if(c.size == 0) r else r*c.size}
-    // println(s"possible arrangements: $n")
+    val n = grids.foldLeft(1.toLong){(r,c) => if(c.size == 0) r else r*c.size}
+    println(s"possible arrangements: $n")
   }
 
   def isSolved(grid: List[List[String]]): Boolean = {
