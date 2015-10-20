@@ -21,9 +21,35 @@ object Solver {
 
   def solve(grid: List[List[String]]) = {
     println("is solved: " + isSolved(grid))
-    grid.foreach{line =>
-      //do some magic here
+    printGrid(grid)
+    // go through the grid and generate all possible lines
+    val grids = grid.zipWithIndex.map{lineAndIndex =>
+      val line = lineAndIndex._1
+      println(s"solving: $line")
+      val numbers = (1 to 9).filterNot(line.filterNot(_ == ".").map(_.toInt).contains(_))
+      println(s"possible numbers: $numbers")
+      val arrangements = numbers.permutations.toSeq
+      val arrangementsSize = arrangements.size
+      println(s"possible arrangements: $arrangementsSize")
+      val newarr = arrangements.map{arrangement =>
+        val it = arrangement.iterator
+        line.map{elem => if (elem != ".") elem else it.next}
+      }.filter{line =>
+        println(line)
+        // filter lines which are not possible from the given grid
+        line.zipWithIndex.foldLeft(true){(r,c) =>
+          // check every number in the possible line for matches in the grid
+          val res = for(line <- grid.patch(lineAndIndex._2, Nil, 1)) yield line(c._2) != c._1
+          res.reduce(_&&_)
+        }
+      }
+      val sizeofarr = newarr.size
+      println(s"filled arrangements: $sizeofarr")
+      newarr
     }
+    grids.foreach{elem => println(elem.size)}
+    // val n = grids.foldLeft(1.toLong){(r,c) => if(c.size == 0) r else r*c.size}
+    // println(s"possible arrangements: $n")
   }
 
   def isSolved(grid: List[List[String]]): Boolean = {
